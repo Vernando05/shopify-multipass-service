@@ -7,10 +7,15 @@
     "sourceMap": true,
     "strict": true,
     "target": "ES5",
-    "allowSyntheticDefaultImports": true
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "types": [
+      "jest"
+    ]
   },
   "compileOnSave": true,
   "include": [
-    "src"
+    "src",
+    "tests"
   ]
 }

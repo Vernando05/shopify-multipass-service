@@ -1,6 +1,7 @@
+import * as functions from 'firebase-functions'
 import * as crypto from 'crypto'
 
-function createMultipassToken(firstName: string, lastName: string, email: string, remoteIp: string) {
+function createMultipassToken(firstName: string, lastName: string, email: string, remoteIp: string) {  
   const now = (new Date()).toISOString()
   const customer = {
     firstName: firstName,
@@ -9,7 +10,7 @@ function createMultipassToken(firstName: string, lastName: string, email: string
     created_at: now,
     remote_ip: remoteIp
   }
-  const hash = crypto.createHash("sha256").update('3a948fc06535be09823737c4b40c8cd0').digest()
+  const hash = crypto.createHash("sha256").update(functions.config().multipass.secret_key).digest()
   const encryptionKey = hash.slice(0, 16)
   const signingKey = hash.slice(16, 32)
 

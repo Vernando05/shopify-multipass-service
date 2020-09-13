@@ -1,0 +1,93 @@
+commands:
+  test:
+    description: |
+      Test using Jest
+    steps:
+    - run: cd functions && npm run test
+    - run: ls
+    - codecov/upload:
+        file: functions/coverage/clover.xml
+  deploy:
+    description: |
+      Deploy to Firebase Cloud Functions
+    steps:    
+    - run: cd functions && ./node_modules/.bin/firebase deploy --token "$FIREBASE_TOKEN" --only functions
+  install:
+    description: |
+      Install dependencies
+    steps:
+    - run: cd functions && npm ci
+    - run: ls  
+orbs:
+  codecov: codecov/codecov@1.0.2
+executors:
+  default:
+    description: |
+      Node 12 runtime environment
+    docker:
+    - image: circleci/node:12.18.3
+jobs:
+  test:
+    description: |
+      Run the tests and generate coverage reports.
+    executor: default
+    steps:
+    - attach_workspace:
+        at: ~/
+    - test
+    - persist_to_workspace:
+        paths:
+        - project   
+        root: ~/
+  deploy:
+    description: |
+      Deploy to production
+    executor: default
+    steps:
+    - attach_workspace:
+        at: ~/    
+    - deploy
+  install:
+    description: |
+      Install dependencies. Checkout is called before install. (Optional) To prevent checkout from being called, pass your steps to before_install.
+    executor: default
+    parameters:
+      path:
+        default: functions
+        type: string
+      before_install:
+        default:
+        - checkout
+        description: |
+          Steps to be executed before restoring cache and running install. Default is to run 'checkout' command.
+        type: steps
+    steps:
+    - steps: <<parameters.before_install>>
+    - restore_cache:
+        key: v1-node-modules-{{ checksum "<<parameters.path>>/package-lock.json" }}
+    - install
+    - persist_to_workspace:
+        paths:
+        - project
+        root: ~/
+    - save_cache:
+        key: v1-node-modules-{{ checksum "<<parameters.path>>/package-lock.json" }}
+        paths:
+        - ~/.npm
+        - ~/.cache
+version: 2.1
+workflows:
+  version: 2.1
+  service-test-deploy:
+    jobs:
+    - install
+    - test:
+        requires:
+        - install
+    - deploy:
+        filters:
+          branches:
+            only:
+            - master
+        requires:
+        - test
