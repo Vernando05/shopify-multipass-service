@@ -7,9 +7,16 @@ import resolvers from './resolvers'
 const server = new ApolloServer({ 
   typeDefs,
   resolvers,
-  context: ({ req }: { req: express.Request }) => ({
-    remoteIp: req.headers['fastly-client-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress
-  })
+  context: ({ req }: { req: express.Request }) => {
+    console.log(req.ip)
+    console.log(req.ips)
+    console.log(req.headers)
+    console.log(req.headers['fastly-client-ip'])
+    console.log(req.headers['x-forwarded-for'])
+    return {
+      remoteIp: req.headers['fastly-client-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress
+    }
+  }
 })
 const app = express()
 app.set('trust proxy', true) 
