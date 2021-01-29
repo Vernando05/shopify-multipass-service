@@ -1,7 +1,8 @@
 import * as functions from 'firebase-functions'
 import * as crypto from 'crypto'
 
-function createMultipassToken(firstName: string, lastName: string, email: string, remoteIp: string) {  
+function createMultipassToken(firstName: string, lastName: string, email: string, remoteIp: string) {
+  console.log(remoteIp)
   const now = (new Date()).toISOString()
   const customer = {
     firstName: firstName,
