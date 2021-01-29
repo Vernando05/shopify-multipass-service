@@ -13,13 +13,14 @@ const server = new ApolloServer({
     console.log(req.headers)
     console.log(req.headers['fastly-client-ip'])
     console.log(req.headers['x-forwarded-for'])
+    console.log(req.connection.remoteAddress)
     return {
       remoteIp: req.headers['fastly-client-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress
     }
   }
 })
 const app = express()
-app.set('trust proxy', true) 
+// app.set('trust proxy', true) 
 server.applyMiddleware({ app })
 
 exports.app = functions.https.onRequest(app)
