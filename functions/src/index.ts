@@ -8,11 +8,11 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }: { req: express.Request }) => ({
-    remoteIp: req.ip
+    remoteIp: req.connection.remoteAddress
   })
 })
 const app = express()
-app.set('trust proxy', true) 
+// app.set('trust proxy', true) 
 server.applyMiddleware({ app })
 
 exports.app = functions.https.onRequest(app)
